@@ -1,0 +1,93 @@
+- content_for :included_javascripts do
+  = javascript_include_tag :events
+
+.row
+  .small-8.small-offset-1.columns
+    = form_for @event do |f|
+      - if @event.errors.any?
+        #error_explanation
+          %ul
+            - @event.errors.full_messages.each do |msg|
+              %li= msg
+      %fieldset
+        .row
+          .small-10.small-offset-1.columns
+            = f.label :name, "Event Name"
+            = f.text_field :name
+        .row
+          .small-10.small-offset-1.columns
+            = f.label :id, "Game ID"
+            = collection_select(:event, :app_id, App.all, :id, :name, {:prompt => true})
+        .row
+          .small-10.small-offset-1.columns
+            = f.label :platform, "Platforms"
+            - Event::PLATFORMS.each do |p|
+              %input{:type => "checkbox", :name => "platform_#{p.first}", :value => 1, :checked => @event.on_platform(p.first), :style => "margin-left: 50px;"}
+              = p.second
+        .row
+          .small-10.small-offset-1.columns
+            = f.label :starts_at
+            = f.text_field :starts_at, :value => @event.starts_at.try(:to_s, :datetimepicker)
+        .row
+          .small-10.small-offset-1.columns
+            = f.label :ends_at
+            = f.text_field :ends_at, :value => @event.ends_at.try(:to_s, :datetimepicker)
+        .row
+          .small-10.small-offset-1.columns
+            = f.label :milestones, "Milestones for Reward"
+            = f.text_field :milestones
+        .row
+          .small-10.small-offset-1.columns
+            = f.label :rewards, "Reward"
+            = f.text_field :rewards
+        .row
+          .small-10.small-offset-1.columns
+            = f.label :eligiblesession, "Sessions Played to be Eligible"
+            = f.text_field :eligiblesession
+        .row
+          .small-10.small-offset-1.columns
+            = f.label :eligiblelevel, "Level Attained to be Eligible"
+            = f.text_field :eligiblelevel
+        .row
+          .small-10.small-offset-1.columns
+            = f.label :reappear, "Time Player Waits Before Reappear"
+            = f.text_field :reappear
+        .row
+          .small-10.small-offset-1.columns
+            = f.label :durationactive, "Duration Active"
+            = f.text_field :durationactive
+        .row
+          .small-10.small-offset-1.columns
+            = f.label :min_app_version, "Minimum App Version Required"
+            = f.text_field :min_app_version
+        .row
+          .small-10.small-offset-1.columns
+            = f.label :min_asset_tag, "Minimum Asset Tag Required"
+            = f.text_field :min_asset_tag
+        .row
+          .small-10.small-offset-1.columns
+            = f.label :countries, "Countries"
+            = select(:event, :countries, options_for_select(GeoIP::CountryName.zip(GeoIP::CountryCode), @event.nil? ? [] : @event.countries), {:multiple => true})
+        .row
+          .small-10.small-offset-1.columns
+            = f.label :notification_content, "Notification Content"
+            = f.file_field :notification_content
+            - if @event.has_notification?
+              %iframe{:src => @event.notification_url, :style => "width:100%; margin-bottom:20px;"}
+        .row
+          .small-10.small-offset-1.columns
+            = f.label :performace_throttle, "Performance Throttle"
+            = f.select :performance_throttle, (0..100)
+        .row
+          .small-10.small-offset-1.columns
+            = f.label :restrictions, "Restrictions"
+            = collection_select(:event, :restrictions, Event::RESTRICTIONS, :first, :last)
+        - if @event.ended?
+          .row
+            .small-10.small-offset-1.columns
+              = f.label :audited, "Audited"
+              %input{:type => "checkbox", :name => "audited", :value => 1, :checked => @event.audited, :style => "margin-left: 50px;"}
+        .row
+          .small-6.small-offset-3.columns
+            = f.submit 'Save', :class => 'button'
+            = link_to 'Cancel', events_path, :class => 'button alert'

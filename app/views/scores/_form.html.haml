@@ -1,0 +1,46 @@
+.row
+  .small-8.small-offset-2.columns
+    = form_for @score do |f|
+      - if @score.errors.any?
+        #error_explanation
+          %h2= "#{pluralize(@score.errors.count, "error")} prohibited this score from being saved:"
+          %ul
+            - @score.errors.full_messages.each do |msg|
+              %li= msg
+
+      %fieldset
+        .row
+          .small-10.small-offset-1.columns
+            = f.label :event, "Event"
+            &nbsp; &nbsp; #{@score.event.app.name} - #{@score.event.name}
+        .row
+          .small-10.small-offset-1.columns
+            = f.label :player, "Player"
+            &nbsp; &nbsp; #{@score.player_id}
+        .row
+          .small-10.small-offset-1.columns
+            = f.label :score_name, "Score Name"
+            &nbsp; &nbsp; #{@score.name}
+
+      %fieldset
+        .row
+          .small-10.small-offset-1.columns
+            = f.label :value, "Value (changing this value may not update the client)"
+            = f.text_field :value
+        .row
+          .small-10.small-offset-1.columns
+            = f.label :milestone, "Highest Milestone Attained"
+            = f.text_field :milestone
+        .row
+          .small-10.small-offset-1.columns
+            = f.label :reward, "Associated Reward with Highest Milestone"
+            = f.text_field :reward
+        .row
+          .small-10.small-offset-1.columns
+            = f.label :cheater_notes, "Cheater Notes (if provided, player will be banned from all events)"
+            = f.text_field :cheater_notes
+        .row
+          .small-6.small-offset-3.columns
+            = f.submit 'Save', :class => 'button'
+            = link_to 'Cancel', scores_path, :class => 'button alert'
+

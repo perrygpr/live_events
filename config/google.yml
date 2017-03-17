@@ -1,0 +1,18 @@
+# Managed here: https://console.developers.google.com/project/651813505816/apiui/credential
+
+development:
+  client_id: 651813505816-ovv477vmlurh9ljr0gioldg9np89scr4.apps.googleusercontent.com
+  client_secret: -KplgrIqAs3gp-HBR3SdETx7
+
+test:
+  client_id: 651813505816-pki152f7o3ugl1e6ue1opv54gkmrlgts.apps.googleusercontent.com
+  client_secret: vr2ecDFZEJTDt89n2nXAMF9h
+
+stage:
+  client_id: 651813505816-pki152f7o3ugl1e6ue1opv54gkmrlgts.apps.googleusercontent.com
+  client_secret: vr2ecDFZEJTDt89n2nXAMF9h
+
+production:
+  client_id: 651813505816-1bq63cappv3o78o2r0a1jt02bttb6h2k.apps.googleusercontent.com
+  client_secret: lKWacPp2EQe59GXZ3jz_ewhZ
+

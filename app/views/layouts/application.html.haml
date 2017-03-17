@@ -1,0 +1,56 @@
+!!! 5
+%html
+  %head
+    %meta{ 'http-equiv' => 'Content-Type', :content => 'text/html; charset=utf-8' }
+    %meta{ 'charset' => 'utf-8' }
+    %meta{ 'name' => "viewport",  'content' => "width=device-width, initial-scale=1.0" }
+    %link{ :rel => 'shortcut icon', :href => '/favicon.ico', :content => 'image/vnd.microsoft.icon' }
+
+    %title= @page_title.blank? ? "PF Live Events (#{Rails.env})" : "PF Live Events (#{Rails.env}) - #{@page_title}"
+    = csrf_meta_tag
+    = stylesheet_link_tag :application
+    = javascript_include_tag "vendor/modernizr"
+    = yield :included_styles
+    - if content_for?(:page_style)
+      %style{ :type => 'text/css' }
+        = yield :page_style
+    = yield :page_head
+  %body
+    %nav.top-bar{:data => {:topbar => true}}
+      %ul.title-area
+        %li.name
+          %h1= link_to "PF Live Events", root_path
+      %section.top-bar-section
+        %ul.left
+          %li{ :class => params[:controller] == 'apps' ? 'active' : '' }
+            = link_to "Apps", apps_path
+          %li{ :class => params[:controller] == 'events' ? 'active' : '' }
+            = link_to "Events", events_path
+          %li{ :class => params[:controller] == 'scores' ? 'active' : '' }
+            = link_to "Scores", scores_path
+        %ul.right
+          - if !current_user
+            %li.show-for-large-up.has-form= link_to "Login", user_omniauth_authorize_path(:google_oauth2), :class => 'button'
+          - else
+            %li{ :class => params[:controller] == 'tools' ? 'active' : '' }
+              = link_to "API Tool", "/apic"
+            %li= link_to current_user.name, "#"
+            %li.show-for-large-up.has-form= link_to "Logout", destroy_user_session_path, :class => 'button'
+    .row
+      - if flash
+        .row{:style => 'padding: 10px;'}
+          .small-4.small-offset-4.column
+            - flash.each do |name, msg|
+              - next unless name == :error || name == :notice
+              %div{:class => "alert-box #{name == :notice ? "success" : "error"} radius", :data => {:alert => true}}
+                = content_tag :div, msg, :id => "flash_#{name}"
+                %a.close &times;
+      = yield
+
+    = javascript_include_tag :application
+    = yield :included_javascripts
+    - if content_for?(:page_javascript)
+      %script{ :type => 'text/javascript', :charset => 'utf-8' }
+        \//<![CDATA[
+        = yield :page_javascript
+        \//]]>

@@ -1,0 +1,98 @@
+- content_for :page_style do
+  \.vcenter {vertical-align:middle !important;}
+  \.hcenter {text-align:center !important;}
+  \.filters {display: inline-block; width: 65%;}
+  \.sort_options {display: inline-block; width: 32%; text-align:right;}
+  \#new {padding: 15px;}
+
+.row
+  .small-8.columns
+    %h2 Events
+  .small-4.columns
+    = link_to new_event_path, :class => "button tiny right", :style => "margin: 10px;" do
+      %i.fi-plus
+.row
+  .filters
+    %a.button.tiny.dropdown{:href => '#', :data => {:dropdown => 'apps'}}
+      = @app.present? ? "#{@app.name}" : "All Games"
+    %ul#apps.f-dropdown{:data => {'dropdown-content' => true}, :style => 'max-width: 300px;'}
+      %li= link_to "All Games", events_path(:app_id => "") if @app.present?
+      - App.all.each do |app|
+        %li= link_to app.name, events_path(:app_id => app.id) if params[:app_id] != app.id.to_s
+    %a.button.tiny.dropdown{:href => '#', :data => {:dropdown => 'platforms'}}
+      = params[:platform].present? ? "#{Event::PLATFORMS[params[:platform]]}" : "All Platforms"
+    %ul#platforms.f-dropdown{:data => {'dropdown-content' => true}, :style => 'max-width: 300px;'}
+      %li= link_to "All Platforms", events_path(:platform => "") if params[:platform].present?
+      - Event::PLATFORMS.each do |platform|
+        %li= link_to platform.second, events_path(:platform => platform.first) if params[:platform] != platform.first
+    %a.button.tiny.dropdown{:href => '#', :data => {:dropdown => 'status'}}
+      = params[:status].present? ? "#{Event::STATUS[params[:status]]}" : "All Events"
+    %ul#status.f-dropdown{:data => {'dropdown-content' => true}, :style => 'max-width: 300px;'}
+      %li= link_to "All Events", events_path(:status => "") if params[:status].present?
+      - Event::STATUS.each do |status|
+        %li= link_to status.second, events_path(:status => status.first) if params[:status] != status.first
+    Search:
+    %input{:type=>"text", :value => params[:search], :onchange => "window.location.href=\"#{events_path()}?search=\"+this.value;", :style => "display: inline-block; margin-bottom: 0px; width: 180px;"}
+  .sort_options
+    Sort:
+    %a.button.tiny.dropdown{:href => '#', :data => {:dropdown => 'sort_by'}}
+      = params[:sort_by] ? "#{EventsController::SORT_ORDER[params[:sort_by]] || 'Name (a-z)'}" : "Name (a-z)"
+    %ul#sort_by.f-dropdown{:data => {'dropdown-content' => true}, :style => 'max-width: 300px;'}
+      - EventsController::SORT_ORDER.each do |order|
+        %li= link_to order.second, events_path(:sort_by => order.first) if params[:sort_by] != order.first
+    Per Page:
+    %a.button.tiny.dropdown{:href => '#', :data => {:dropdown => 'per_page'}}
+      = params[:per_page] != '0' ? "#{params[:per_page] || '15'}" : 'All'
+    %ul#per_page.f-dropdown{:data => {'dropdown-content' => true}, :style => 'max-width: 300px;'}
+      - EventsController::PAGINATION_OPTIONS.each do |per_page|
+        %li= link_to per_page.second, events_path(:per_page => per_page.first) if params[:per_page] != per_page.first
+
+%table.events-table{:style => 'width: 100%;'}
+  %thead
+    %tr
+      %th Name
+      %th App
+      %th Platforms
+      %th Dates (UTC)
+      %th Status
+      %th
+  %tbody
+    - if !@events.empty?
+      - @events.each do |event|
+        %tr
+          %td.vcenter
+            = event.name
+          %td.vcenter
+            = App.find(event.app_id).name
+          %td.vcenter
+            = event.platforms
+          %td.vcenter
+            = event.starts_at.try(:to_s, :datetimepicker)
+            to
+            %br
+            = event.ends_at.try(:to_s, :datetimepicker)
+          %td.vcenter
+            - if !event.started?
+              Scheduled
+            - elsif !event.ended?
+              Running
+              %br
+              - if event.performance_throttle < 100
+                Allow #{event.performance_throttle}% 
+              - if event.restrictions.present?
+                = Event::RESTRICTIONS[event.restrictions]
+            - elsif event.complete?
+              Ended
+            - else
+              In Review
+          %td.vcenter{:style => "width: 130px;"}
+            %ul.button-group.right.controls
+              %li
+                = link_to edit_event_path(event) do
+                  %i.fi-pencil.button.tiny.success{:style => "margin: 0px;padding: 0.3rem 0.5rem;"}
+              %li
+                = link_to event, :method => :delete, :data => { :confirm => "Delete #{event.name}?" } do
+                  %i.fi-x.button.tiny.alert{:style => "margin: 0px;padding: 0.3rem 0.5rem;"}
+
+.pagination-centered
+  = foundation_paginate @events if params[:per_page] != '0'

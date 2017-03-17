@@ -1,0 +1,27 @@
+.row
+  .small-8.small-offset-2.columns
+    = form_for @app do |f|
+      - if @app.errors.any?
+        #error_explanation
+          %h2= "#{pluralize(@app.errors.count, "error")} prohibited this app from being saved:"
+          %ul
+            - @app.errors.full_messages.each do |msg|
+              %li= msg
+      %fieldset
+        .row
+          .small-10.small-offset-1.columns
+            = f.label :name
+            = f.text_field :name
+        .row
+          .small-10.small-offset-1.columns
+            = f.label :id, "Game ID"
+            = f.text_field :id, :disabled => @app.id?
+        .row
+          .small-10.small-offset-1.columns
+            = f.label :id, "Secret Key"
+            = f.text_field :secret_key, :disabled => @app.secret_key?
+        .row
+          .small-6.small-offset-3.columns
+            = f.submit 'Save', :class => 'button'
+            = link_to 'Cancel', apps_path, :class => 'button alert'
+

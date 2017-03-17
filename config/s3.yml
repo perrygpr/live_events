@@ -1,0 +1,39 @@
+development:
+  bucket_name: pf-live-events-stage
+  access_key: AKIAJBW22ZOLEMPYBMHQ
+  secret_key: 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
+  region: us-west-2
+  cdn_url: live-events-stage-assets.playfirst.com
+
+test:
+  bucket_name: pf-live-events-stage
+  access_key: AKIAJBW22ZOLEMPYBMHQ
+  secret_key: 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
+  region: us-west-2
+  cdn_url: live-events-stage-assets.playfirst.com
+
+#test:
+#  bucket_name: 
+#  access_key: 
+#  secret_key:
+#  region:
+
+production: &production
+  bucket_name: pf-live-events
+  access_key: AKIAJUQEOKJQ7OS5ZNRQ
+  secret_key: 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
+  region: us-west-2
+  cdn_url: live-events-assets.playfirst.com
+
+stage:
+  bucket_name: pf-live-events-stage
+  access_key: AKIAJBW22ZOLEMPYBMHQ
+  secret_key: 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
+  region: us-west-2
+  cdn_url: live-events-stage-assets.playfirst.com
+
+production-api:
+  <<: *production
+
+production-admin:
+  <<: *production

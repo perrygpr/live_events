@@ -1,0 +1,82 @@
+- content_for :page_style do
+  \.vcenter {vertical-align:middle !important;}
+  \.hcenter {text-align:center !important;}
+  \.filters {display: inline-block; width: 65%;}
+  \.sort_options {display: inline-block; width: 32%; text-align:right;}
+
+.row
+  .small-8.columns
+    %h2 Scores
+.row
+  .filters
+    %a.button.tiny.dropdown{:href => '#', :data => {:dropdown => 'apps'}}
+      = @app.present? ? "#{@app.name}" : "Select an App"
+    %ul#apps.f-dropdown{:data => {'dropdown-content' => true}, :style => 'max-width: 300px;'}
+      - App.all.each do |app|
+        %li= link_to app.name, scores_path(:app_id => app.id) if params[:app_id] != app.id
+    - if !@events.nil? && !@events.empty?
+      %a.button.tiny.dropdown{:href => '#', :data => {:dropdown => 'events'}}
+        = @event.present? ? "#{@event.name}" : "Select an Event"
+      %ul#events.f-dropdown{:data => {'dropdown-content' => true}, :style => 'max-width: 300px;'}
+        - @events.each do |event|
+          %li= link_to event.name, scores_path(:event_id => event.id) if params[:event_id] != event.id
+    - if !@score_names.nil? && !@score_names.empty?
+      %a.button.tiny.dropdown{:href => '#', :data => {:dropdown => 'names'}}
+        = params[:name].present? ? params[:name] : "Select a Score Type"
+      %ul#names.f-dropdown{:data => {'dropdown-content' => true}, :style => 'max-width: 300px;'}
+        - @score_names.each do |score_name|
+          %li= link_to score_name, scores_path(:name => score_name) if params[:name] != score_name
+    - if !@scores.nil?
+      Player:
+      %input{:type=>"text", :value => params[:player_id], :onchange => "window.location.href=\"#{scores_path()}?player_id=\"+this.value;", :style => "display: inline-block; margin-bottom: 0px; width: 100px;"}
+  .sort_options
+    Sort:
+    %a.button.tiny.dropdown{:href => '#', :data => {:dropdown => 'sort_by'}}
+      = params[:sort_by] ? "#{ScoresController::SORT_ORDER[params[:sort_by]] || 'Value (highest)'}" : "Value (highest)"
+    %ul#sort_by.f-dropdown{:data => {'dropdown-content' => true}, :style => 'max-width: 300px;'}
+      - ScoresController::SORT_ORDER.each do |order|
+        %li= link_to order.second, scores_path(:sort_by => order.first) if params[:sort_by] != order.first
+    Per Page:
+    %a.button.tiny.dropdown{:href => '#', :data => {:dropdown => 'per_page'}}
+      = params[:per_page] != '0' ? "#{params[:per_page] || '15'}" : 'All'
+    %ul#per_page.f-dropdown{:data => {'dropdown-content' => true}, :style => 'max-width: 300px;'}
+      - ScoresController::PAGINATION_OPTIONS.each do |per_page|
+        %li= link_to per_page.second, scores_path(:per_page => per_page.first) if params[:per_page] != per_page.first
+
+%table.scores-table{:style => 'width: 100%;'}
+  %thead
+    %tr
+      %th Player
+      %th Value
+      %th Milestone
+      %th Reward
+      %th Last Update
+      %th
+  %tbody
+    - if !@scores.nil? && !@scores.empty?
+      - @scores.each do |score|
+        %tr
+          %td.vcenter{:style => score.cheater_id.present? ? "color:red;" : ""}
+            = score.player_id
+          %td.vcenter{:style => score.cheater_id.present? ? "color:red;" : ""}
+            = score.value
+          %td.vcenter{:style => score.cheater_id.present? ? "color:red;" : ""}
+            = score.milestone
+          %td.vcenter{:style => score.cheater_id.present? ? "color:red;" : ""}
+            = score.reward
+          %td.vcenter{:style => score.cheater_id.present? ? "color:red;" : ""}
+            = score.updated_at.in_time_zone('America/Los_Angeles').to_formatted_s(:db)
+          %td.vcenter
+            = link_to edit_score_path(score) do
+              %i.fi-pencil.button.tiny.success{:style => "margin: 0px;padding: 0.3rem 0.5rem;"}
+
+- if !@events.nil? && @events.empty?
+  .centered
+    No events yet
+
+- if !@score_names.nil? && @score_names.empty?
+  .centered
+    No scores yet
+
+.pagination-centered
+  = foundation_paginate @scores if !@scores.nil? && params[:per_page] != '0'

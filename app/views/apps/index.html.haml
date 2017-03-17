@@ -1,0 +1,59 @@
+- content_for :page_style do
+  \.vcenter {vertical-align:middle !important;}
+  \.hcenter {text-align:center !important;}
+  \.filters {display: inline-block; width: 65%;}
+  \.sort_options {display: inline-block; width: 32%; text-align:right;}
+  \#order {display: inline;}
+  \#new {padding: 15px;}
+
+.row
+  .small-8.columns
+    %h2 Apps
+  .small-4.columns
+    = link_to new_app_path, :class => "button tiny right", :style => "margin: 10px;" do
+      %i.fi-plus
+.row
+  .filters
+    Search:
+    %input{:type=>"text", :value => params[:search], :onchange => "window.location.href=\"#{apps_path()}?search=\"+this.value;", :style => "display: inline-block; margin-bottom: 0px; width: 200px;"}
+  .sort_options
+    %a.button.tiny.dropdown{:href => '#', :data => {:dropdown => 'sort_by'}}
+      = params[:sort_by] ? "#{AppsController::SORT_ORDER[params[:sort_by]] || 'Name (a-z)'}" : "Name (a-z)"
+    %ul#sort_by.f-dropdown{:data => {'dropdown-content' => true}, :style => 'max-width: 300px;'}
+      - AppsController::SORT_ORDER.each do |order|
+        %li= link_to order.second, apps_path(:sort_by => order.first) if params[:sort_by] != order.first
+    Per Page:
+    %a.button.tiny.dropdown{:href => '#', :data => {:dropdown => 'per_page'}}
+      = params[:per_page] != '0' ? "#{params[:per_page] || '15'}" : 'All'
+    %ul#per_page.f-dropdown{:data => {'dropdown-content' => true}, :style => 'max-width: 300px;'}
+      - AppsController::PAGINATION_OPTIONS.each do |per_page|
+        %li= link_to per_page.second, apps_path(:per_page => per_page.first) if params[:per_page] != per_page.first
+
+%table.apps-table{:style => 'width: 100%;'}
+  %thead
+    %tr
+      %th Name
+      %th ID
+      %th Secret Key
+      %th
+  %tbody
+    - if !@apps.empty?
+      - @apps.each do |app|
+        %tr
+          %td.vcenter
+            = app.name
+          %td.vcenter
+            = app.id
+          %td.vcenter
+            = app.secret_key
+          %td.vcenter
+            %ul.button-group.right.controls
+              %li
+                = link_to edit_app_path(app) do
+                  %i.fi-pencil.button.tiny.success{:style => "margin: 0px;padding: 0.3rem 0.5rem;"}
+              %li
+                = link_to app, :method => :delete, :data => { :confirm => "Delete #{app.name}?" } do
+                  %i.fi-x.button.tiny.alert{:style => "margin: 0px;padding: 0.3rem 0.5rem;"}
+
+.pagination-centered
+  = foundation_paginate @apps if params[:per_page] != '0'
